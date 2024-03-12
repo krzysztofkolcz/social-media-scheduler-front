@@ -2,8 +2,8 @@ import React, {useState} from "react";
 import UserPool from "./UserPool";
 
 const Signup = () => {
-    const [email,setEmail] = useState("test@technicarium.com")
-    const [password,setPassword] = useState("Alamakota2@")
+    const [email,setEmail] = useState("")//test@technicarium.com
+    const [password,setPassword] = useState("")//Alamakota2@
     const onSubmit = (event : React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         UserPool.signUp(email, password, [] ,[],(err ,data) => {
