@@ -1,4 +1,4 @@
-import {CognitoUserPool} from "amazon-cognito-identity-js";
+import {CognitoUserPool, } from "amazon-cognito-identity-js";
 
 const poolData = {
     UserPoolId: "eu-central-1_RDs64szop",

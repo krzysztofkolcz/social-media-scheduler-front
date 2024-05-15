@@ -1,14 +1,17 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import Signup from './Signup';
-import Login from './Login';
+import LoginMui from './components/Authentication/LoginMui';
+import Status from './components/Authentication/Status';
+import useAccount from "./hooks/useAccount";
 
 function App() {
+
+  const { isLoggedIn } = useAccount();
+  console.log("App Is logged in:"+isLoggedIn);
   return (
     <div className="App">
-      <Signup />
-      <Login />
+      <Status />
+      <LoginMui />
     </div>
   );
 }

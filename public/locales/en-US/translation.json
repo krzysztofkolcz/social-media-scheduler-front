@@ -1,0 +1,26 @@
+{
+    "loginMui":{
+        "signIn": "Sign In",
+        "emailAddress":"Email Address",
+        "password":"Password",
+        "forgotPassword":"Forgot password?",
+        "dontHaveAccount":"Don't have an account? Sign Up",
+        "rememberMe":"Remember me",
+        "error":{
+            "emailCannotBeEmpty":"Email cannot be empty",
+            "incorrectEmail":"Incorrect email address",
+            "passwordCannotBeEmpty":"Password cannot be empty",
+            "incorrectUsernameOrPassword": "Incorrect username or password"
+        }
+
+    },
+    "changePassword":{
+
+        "password":"Password",
+        "passwordsDontMatch": "passwords don't match",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password",
+        "changePassword": "Change password"
+
+    }
+}
