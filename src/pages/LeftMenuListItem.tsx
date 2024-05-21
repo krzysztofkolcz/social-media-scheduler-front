@@ -3,7 +3,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import useAccount from '../hooks/useAccount';
+import useAccount from '../hooks/useAuth';
 
 export interface MenuListItemProps {
   text: string;

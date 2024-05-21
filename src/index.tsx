@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   createBrowserRouter,
-  RouterProvider,
   BrowserRouter,
   Routes,
   Route 
@@ -10,8 +9,8 @@ import {
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import ErrorPage from './routes/ErrorPage';
-import Backend from './routes/Backend';
+import ErrorPage from './pages/ErrorPage';
+import Backend from './pages/Backend';
 import { Provider } from 'react-redux'
 import { store } from './store'
 import Register from './components/Authentication/Register';
@@ -19,11 +18,9 @@ import LoginMui from './components/Authentication/LoginMui';
 import './i18n';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
-import { blueGrey, red, teal } from '@mui/material/colors';
-import Paperbase from './example/Paperbase';
-import { Account } from './components/Authentication/Account';
+import {  teal } from '@mui/material/colors';
 import ChangePassword from './components/Authentication/ChangePassword';
-import Button from '@mui/material/Button';
+import { Auth } from './components/Authentication/Auth';
 import { ProtectedRoute } from './common/ProtectedRoute'
 
 const router = createBrowserRouter([
@@ -48,10 +45,6 @@ const router = createBrowserRouter([
   {
     path: "/backend",
     element: <ProtectedRoute><Backend /></ProtectedRoute>,
-  },
-  {
-    path: "/paperbase",
-    element: <Paperbase />,
   },
 ]);
 
@@ -92,29 +85,29 @@ const theme = createTheme({
 
 
 root.render(
-  <React.StrictMode>
-    <Account>
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <RouterProvider router={router} />
-        </ThemeProvider>
-      </Provider>
-    </Account>
-  </React.StrictMode>
-
   // <React.StrictMode>
   //   <Account>
   //     <Provider store={store}>
   //       <ThemeProvider theme={theme}>
-  //         <BrowserRouter>
-  //           <Routes>
-  //             <Route path="/*" element={<App />}/>
-  //           </Routes>
-  //         </BrowserRouter>
+  //         <RouterProvider router={router} />
   //       </ThemeProvider>
   //     </Provider>
   //   </Account>
   // </React.StrictMode>
+
+  <React.StrictMode>
+    <Auth>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/*" element={<App />}/>
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
+      </Provider>
+    </Auth>
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

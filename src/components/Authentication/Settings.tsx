@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import useAccount from "../../hooks/useAccount";
+import useAccount from "../../hooks/useAuth";
 
 export default () => {
     const { getSession } = useAccount();

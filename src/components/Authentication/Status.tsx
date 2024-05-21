@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import Link from '@mui/material/Link';
-import useAccount from "../../hooks/useAccount";
+import useAccount from "../../hooks/useAuth";
 import Button from '@mui/material/Button';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';

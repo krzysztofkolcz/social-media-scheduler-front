@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import {validatePassword}  from '../../common/Util'
 import { useTranslation } from 'react-i18next';
-import useAccount from "../../hooks/useAccount";
+import useAccount from "../../hooks/useAuth";
 import Box from '@mui/material/Box';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';

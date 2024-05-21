@@ -1,36 +1,20 @@
 import React, {useState,useContext} from "react";
-import {AccountContext} from "./Account";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme} from '@mui/material/styles';
 import validator from "validator";
 import { useTranslation } from 'react-i18next';
-import useAccount from "../../hooks/useAccount";
-import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import { useNavigate, useLocation } from "react-router-dom";
 import FormHelperText from '@mui/material/FormHelperText';
-
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Technicarium
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 // TODO 
 // 1. Validate inputs - email, password
@@ -42,18 +26,16 @@ export default function SignIn() {
 
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
-    // const [email,setEmail] = useState("")
     const [isEmailError,setIsEmailError] = useState(false)
     const [emailError,setEmailError] = useState("")
-    // const [password,setPassword] = useState("")
     const [passwordError,setPasswordError] = useState("")
     const [isPasswordError,setIsPasswordError] = useState(false)
     const [helperText, setHelperText] = useState("") 
-
-
-    const { isLoggedIn } = useAccount();
+    const { isLoggedIn } = useAuth();
     console.log("LoginMui, user is logged in:"+isLoggedIn());
-    const {authenticate } = useAccount();
+    const {authenticate } = useAuth();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
 
     const onSubmit = (event : React.FormEvent<HTMLFormElement>) => {
       event.preventDefault()
@@ -70,7 +52,8 @@ export default function SignIn() {
       authenticate(emailValue,passwordValue)
       .then(data => {
         console.log("Logged in:", data);
-        return navigate("/backend");
+        navigate(from, { replace: true})
+        // return navigate("/backend");
       }).catch(err => {
         console.log("Logged error:", err);
         setHelperText(t('loginMui.error.incorrectUsernameOrPassword'))
@@ -181,7 +164,6 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
   );
 }
