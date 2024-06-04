@@ -1,19 +1,17 @@
 import React, { useState, createContext } from "react";
-import {AuthenticationDetails, CognitoUserPool, CognitoUser, CognitoUserAttribute, CognitoAccessToken, CognitoRefreshToken} from "amazon-cognito-identity-js";
+import {AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoAccessToken, CognitoRefreshToken  } from "amazon-cognito-identity-js";
 import {CognitoUserSession} from "amazon-cognito-identity-js";
 import Pool from "./UserPool";
+import { loadState, saveState } from "../../helper/sessionStorage";
 
 export interface IAuth{
     authenticate: (Username:string, Password:string) => Promise<any>,
     getSession: () => Promise<any> ,
     logout: () => void,
-    isLoggedIn: () => boolean,
-    // getAccessToken: () => CognitoAccessToken | undefined,
-    logged: boolean,
-    refresh: () => void,
-    userSession: CognitoUserSession | undefined,
-    // authState: {},
-    // setAuthState: () => void,
+    refresh: () => Promise<any>,
+    getAccessToken: () => string | undefined,
+    getRefreshToken: () => string | undefined,
+    isLoggedIn: () => boolean
 }
 
 
@@ -21,47 +19,34 @@ const AuthContext = createContext<IAuth>({
     authenticate: async (Username:string, Password:string) => Promise<any>,
     getSession: async () => Promise<any>,
     logout: () => {},
-    isLoggedIn: () => false,
-    // getAccessToken: () => undefined,
-    refresh: () => {},
-    logged: false,
-    userSession: undefined,
-    // authState: {},
-    // setAuthState: () => {}
+    refresh: async () => Promise<any>,
+    getAccessToken: () => undefined,
+    getRefreshToken: () => undefined,
+    isLoggedIn: () => false 
 });
 
 const Auth = ({children}: { children: React.ReactNode }) => {
-    const [logged, setLogged] = useState(false);
     const [userSession, setUserSession] = useState<CognitoUserSession>();
-    const [accessToken, setAccessToken] = useState<CognitoAccessToken>();
-    const [refreshToken, setRefreshToken] = useState<CognitoRefreshToken>();
-    // const [authState, setAuthState] = useState({});// { user, pwd, roles, accessToken }
 
     const getSession: () => Promise<any> = async () => {
         return await new Promise((resolve,reject) => {
+            try{
                 const user = Pool.getCurrentUser();
                 if(user){
                     console.log("Auth getSession user")
                     user.getSession(async (err:Error|null, session:null | CognitoUserSession) => {
                         if(err){
-                            console.log("getSession err:"+err)
-                            reject()
+                            reject(err)
                         }else{
-                            console.log("Auth getSession async success")
-                            // resolve(session)
                             const attributes :{[key:string]:string;}= await new Promise((resolve,reject)=>{
                                 user.getUserAttributes((err: Error|undefined,attributes: CognitoUserAttribute[]|undefined) => {
                                     if(err){
-                                        console.log("Auth getSession getUserAttributes err:"+err)
                                         reject(err)
                                     }else{
-                                        console.log("Auth getSession getUserAttributes")
                                         const results:{[key:string]:string;} = {};
-                                        if(attributes != undefined){
+                                        if(attributes !== undefined){
                                             for(let attribute of attributes){
                                                 const {Name,Value}=attribute;
-                                                // console.log("Attributes:")
-                                                console.log(Name+":"+Value);
                                                 results[Name] = Value;
                                             }
                                         }
@@ -75,6 +60,9 @@ const Auth = ({children}: { children: React.ReactNode }) => {
                 }else{
                     reject("No current user")
                 }
+            }catch(err){
+                reject(err)
+            }
         })
     }
 
@@ -85,27 +73,23 @@ const Auth = ({children}: { children: React.ReactNode }) => {
             user.authenticateUser(authDetails, {
                 onSuccess: (data:CognitoUserSession) => {
                     console.log("Auth authenticate onSuccess:", data);
-                    setLogged(true)
-                    console.log("Auth authenticate onSuccess logged:", logged);
-                    // setAccessToken(data.getAccessToken());
-                    // setRefreshToken(data.getRefreshToken());
                     setUserSession(data);
+                    saveState("accessToken",data.getAccessToken().getJwtToken()) 
+                    saveState("refreshToken",data.getRefreshToken().getToken()) 
                     resolve(data)
-                    //   return navigate("/backend");
                 },
                 onFailure: (err) => {
                     console.error("Auth authenticate onFailure:", err);
-                    setLogged(false)
-                    // setAccessToken(undefined);
-                    // setRefreshToken(undefined);
                     setUserSession(undefined);
+                    saveState("accessToken",undefined) 
+                    saveState("refreshToken",undefined) 
                     reject(err)
                 },
                 newPasswordRequired: (data) => {
                     console.log("Auth authenticate newPasswordRequired:", data);
-                    // setAccessToken(data.getAccessToken());
-                    // setRefreshToken(data.getRefreshToken());
                     setUserSession(data);
+                    saveState("accessToken",data.getAccessToken().getJwtToken()) 
+                    saveState("refreshToken",data.getRefreshToken().getToken()) 
                     resolve(data)
                 }
             });
@@ -113,58 +97,80 @@ const Auth = ({children}: { children: React.ReactNode }) => {
     }
 
     const logout = () => {
-        const user = Pool.getCurrentUser();
         console.log("Auth logout function")
-        if(user){
-            user.signOut();
-            setLogged(false)
-            setUserSession(undefined);
-            // setAccessToken(undefined);
-        }
-    }
-
-    const isLoggedIn = () => {
-        console.log("Auth authenticate onSuccess logged:", logged);
-        return logged;
-    }
-
-    // const getAccessToken = () => {
-    //     return accessToken;
-    // }
-
-    const refresh = () => {
-        const user = Pool.getCurrentUser();
-        console.log('Auth Refresh');
-        if(user){
-            let refreshToken = userSession?.getRefreshToken();
-            let refreshTokenString = refreshToken?.getToken();
-            console.log(`Auth Refresh token: ${refreshTokenString}`);
-            if(refreshToken != undefined){
-                user.refreshSession(refreshToken, (err,session:CognitoUserSession) => {
-                    if (err) {//throw err;
-                        console.log('In the err'+err);
-                    }
-                    else{
-                        // var regsmar_apiKey = session.idToken.jwtToken; // will this provide new IdToken?
-                        // localStorage.setItem('api_key',regsmar_apiKey);
-                        console.log('Auth Refresh, refresh Session:'+session);
-                        console.log('Auth Refresh, refresh Session:');
-                        console.log(session);
-                        console.log('Auth Refresh, refresh Session.getAccessToken().getJwtToken():');
-                        console.log(session.getAccessToken().getJwtToken());
-                        console.log(`Auth Refresh, refresh Session: ${session}`);
-                        setUserSession(session);
-                    }
-                });
+        try{
+            const user = Pool.getCurrentUser();
+            if(user){
+                user.signOut();
+                // setAccessToken(undefined);
+            }else{
+                // already logged out?
             }
-            setLogged(false)
-            // setAccessToken(undefined);
+        }catch(err){
+            //error by logging out?
+            console.log(err);
         }
+        setUserSession(undefined);
+        saveState("accessToken",undefined) 
+        saveState("refreshToken",undefined) 
+    }
+
+    const refresh: () => Promise<any> = async () =>  {
+        return await new Promise((resolve,reject) => {
+            const user = Pool.getCurrentUser();
+            console.log('Auth Refresh');
+            if(user){
+                let refreshToken = getRefreshToken();
+                if(refreshToken !== undefined){
+                    let rt = refreshToken !== undefined ? refreshToken : "";
+                    let cognitoRefreshToken: CognitoRefreshToken= new CognitoRefreshToken({RefreshToken:rt}) ;
+                    user.refreshSession(cognitoRefreshToken, (err,session:CognitoUserSession) => {
+                        if (err) {//throw err;
+                            console.log('Auth Refresh, refreshSession error:'+err);
+                            setUserSession(undefined);
+                            reject(err);
+                        }
+                        else{
+                            console.log('Auth Refresh, refresh Session:');
+                            console.log(session);
+                            console.log('Auth Refresh, refresh Session.getAccessToken().getJwtToken():');
+                            console.log(session.getAccessToken().getJwtToken());
+                            setUserSession(session);
+                            resolve(session);
+                            saveState("accessToken",session.getAccessToken().getJwtToken());
+                            saveState("refreshToken",session.getRefreshToken().getToken());
+                        }
+                    });
+                }else{
+                    setUserSession(undefined);
+                    saveState("accessToken",undefined);
+                    saveState("refreshToken",undefined);
+                    reject("Auth Refresh: no refreshToken")
+                }
+            }else{
+                    setUserSession(undefined);
+                    saveState("accessToken",undefined);
+                    saveState("refreshToken",undefined);
+                reject("Auth Refresh: no user")
+            }
+        });
+    }
+
+    const getAccessToken: () => string | undefined = () => {
+        return loadState("accessToken", undefined)
+    }
+
+    const getRefreshToken: () => string | undefined = () => {
+        return loadState("refreshToken", undefined)
+    }
+
+    const isLoggedIn: () => boolean = () => {
+        return loadState("accessToken", undefined) !== undefined;
     }
 
 
     return (
-        <AuthContext.Provider value={{userSession, authenticate, getSession, logout, isLoggedIn, logged, refresh }}>
+        <AuthContext.Provider value={{ authenticate, getSession, logout, refresh, getAccessToken, getRefreshToken, isLoggedIn}}>
             {children}
         </AuthContext.Provider>
     )

@@ -1,25 +1,18 @@
 import  config  from "../config/Config"
-import axios from 'axios'
+import axios from '../api/axios'
 import { useEffect, useState } from "react";
 import Settings from '../components/Authentication/Settings'
-import useAccount from "../hooks/useAuth";
 
 export default function Backend() {
 
   const [backendMsg, setBackendMsg] = useState("frontend Message");
-  const { isLoggedIn, userSession} = useAccount();
-  let accessToken = userSession?.getAccessToken();
   let jwtToken = "";
-  if(accessToken != null){
-    jwtToken = accessToken.getJwtToken();
-  }
-  console.log("Backend, user is logged in:"+isLoggedIn());
 
   const getBackendMsg = async () => {
     const response = await axios.get(config.serverUrl + "/api/v1/scheduler", {
-        headers: {
-            'Authorization': `Bearer ${jwtToken}`,
-        }
+        // headers: {
+        //     'Authorization': `Bearer ${jwtToken}`,
+        // }
     }).then((res) => {
       const data = res.data;
       setBackendMsg(data);

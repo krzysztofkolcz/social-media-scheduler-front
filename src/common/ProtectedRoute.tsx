@@ -1,24 +1,12 @@
-import {
-  Routes,
-  Route,
-  NavLink,
-  Navigate,
-  useNavigate,
-  useLocation,
-  Outlet
-} from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 export const ProtectedRoute  = ({children}: { children: React.ReactNode }) : JSX.Element => {
-  const { isLoggedIn, logged } = useAuth();
-
-  console.log("Protected route.")
-  console.log("Is logged in:"+isLoggedIn())
-  if (!isLoggedIn()) {
-    console.log("Protected route redirect to login.")
+  const { isLoggedIn } = useAuth();
+  if (!isLoggedIn()){
+    console.log("Protected route. User NOT loggedId")
     return <Navigate to="/login" replace />;
   }
-
-  console.log("Protected route no redirection.")
+  console.log("Protected route. User oggedId")
   return (<>{children}</>);
 };

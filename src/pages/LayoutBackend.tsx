@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { CognitoUser} from "amazon-cognito-identity-js";
+import {useState,useEffect} from "react";
 import { Outlet } from "react-router-dom"
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -109,6 +111,7 @@ function test(){
 }
 
 export default function MiniDrawer() {
+
   const dispatch = useAppDispatch()
   const isOpened = useAppSelector(isDrawerOpen)
   const theme = useTheme();
@@ -146,7 +149,6 @@ export default function MiniDrawer() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
           </Typography>
           <Status />
           <Settings /> 

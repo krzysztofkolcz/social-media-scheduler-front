@@ -3,18 +3,24 @@ import { useState, useEffect } from "react";
 // import useRefreshToken from '../hooks/useRefreshToken'; // TODO
 import useAuth from "../../hooks/useAuth";
 import { verify } from "crypto";
+import { loadState, saveState } from "../../helper/sessionStorage";
 
 const PersistLogin = () => {
     const [isLoading, setIsLoading] = useState(true);
-    // const refresh = useRefreshToken();
-    const { refresh, userSession } = useAuth();
+    const { refresh, isLoggedIn } = useAuth();
 
     useEffect(() => {
         const verifyRefreshToken = async () => {
             console.log(`PersistLogin verifyRefreshToken`)
             try{
                 console.log(`PersistLogin call useAuth().refresh()`)
-                await refresh();
+                refresh()
+                .then(response => {
+                    console.log("PersistLogin refresh response:"+response);
+                })
+                .catch(e => {
+                    console.log("PersistLogin refresh error:"+e);
+                });
             }
             catch(err){
                 console.error(err);
@@ -22,13 +28,11 @@ const PersistLogin = () => {
                 setIsLoading(false);
             }
         }
-
-        !userSession?.getAccessToken().getJwtToken() ? verifyRefreshToken() : setIsLoading(false) 
+        isLoggedIn() ? setIsLoading(false) : verifyRefreshToken()
     }, [])
 
     useEffect(() => {
         console.log(`PersistLogin isLoading: ${isLoading}`)
-        console.log(`PersistLogin Access Token, JWT Token: ${userSession?.getAccessToken().getJwtToken()}`)
     }, [isLoading])
 
     return (

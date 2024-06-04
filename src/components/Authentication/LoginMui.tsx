@@ -31,8 +31,6 @@ export default function SignIn() {
     const [passwordError,setPasswordError] = useState("")
     const [isPasswordError,setIsPasswordError] = useState(false)
     const [helperText, setHelperText] = useState("") 
-    const { isLoggedIn } = useAuth();
-    console.log("LoginMui, user is logged in:"+isLoggedIn());
     const {authenticate } = useAuth();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
@@ -51,7 +49,7 @@ export default function SignIn() {
       let passwordValue = password==null?"":password.toString()
       authenticate(emailValue,passwordValue)
       .then(data => {
-        console.log("Logged in:", data);
+        console.log("Login Mui, Authenticate success.");
         navigate(from, { replace: true})
         // return navigate("/backend");
       }).catch(err => {

@@ -1,23 +1,23 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useEffect } from "react";
 import Link from '@mui/material/Link';
-import useAccount from "../../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import Button from '@mui/material/Button';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 const Status = () => {
-    const [status, setStatus] = useState(false)
-    const { getSession, logout, isLoggedIn } = useAccount();
 
+    const { getSession, logout, isLoggedIn } = useAuth();
     useEffect(() => {
-        getSession().then((session) =>{
-            setStatus(true)
-        }).catch(err => {
-            setStatus(false)
+        getSession().then((session) => {
+            console.log("Status session:");
+            console.log(session);
         })
-    }, [])
 
-    return <div>{isLoggedIn() ? (
+    },[]);
+
+    return <div>
+        {isLoggedIn() ? (
         <Button
             color="secondary"
             type="submit"
@@ -37,7 +37,6 @@ const Status = () => {
         rel="noopener noreferrer"
         target="_blank"
     href="/login">Log in</Link>}</div> 
-    
     ;
 };
 export default Status
